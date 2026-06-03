@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuth() { return request.auth != null; }
+    function onTeam(teamId) { return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.teamId == teamId; }
+    match /users/{userId} { allow read, write: if request.auth.uid == userId; }
+    match /teams/{teamId} { allow read, write: if onTeam(teamId); }
+    match /athletes/{athleteId} { allow read, write: if isAuth() && onTeam(resource.data.teamId); allow create: if isAuth(); }
+    match /times/{timeId} { allow read: if isAuth() && onTeam(resource.data.teamId); allow create: if isAuth(); allow update, delete: if isAuth() && onTeam(resource.data.teamId); }
+    match /personalBests/{pbId} { allow read: if isAuth() && onTeam(resource.data.teamId); allow write: if isAuth(); }
+    match /sessions/{sessionId} { allow read, write: if isAuth() && onTeam(resource.data.teamId); allow create: if isAuth(); }
+  }
+}

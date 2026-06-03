@@ -1,0 +1,9 @@
+node_modules/
+frontend/dist/
+functions/lib/
+.env
+.env.local
+.env.*.local
+.firebase/
+.wrangler/
+.DS_Store
